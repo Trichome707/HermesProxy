@@ -66,7 +66,10 @@ public static class Opcodes
                 or ClientVersionBuild.V1_14_2_42065
                 or ClientVersionBuild.V1_14_2_42082
                 or ClientVersionBuild.V1_14_2_42214
-                or ClientVersionBuild.V1_14_2_42597 => ClientVersionBuild.V2_5_3_41750,
+                or ClientVersionBuild.V1_14_2_42597
+                // UNVERIFIED: assumes 2.5.6's opcode numbering matches 2.5.3's; not confirmed
+                // against a real capture (2.5.6 SMSG_UPDATE_OBJECT never observed in testing).
+                or ClientVersionBuild.V2_5_6_68941 => ClientVersionBuild.V2_5_3_41750,
             ClientVersionBuild.V3_4_3_54261 => ClientVersionBuild.V3_4_3_54261,
             _ => ClientVersionBuild.Zero,
         };

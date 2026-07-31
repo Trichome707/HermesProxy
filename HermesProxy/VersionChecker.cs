@@ -102,6 +102,7 @@ public static class VersionChecker
                 or ClientVersionBuild.V1_14_2_42082
                 or ClientVersionBuild.V1_14_2_42214
                 or ClientVersionBuild.V1_14_2_42597
+                or ClientVersionBuild.V2_5_6_68941 // Phase 1 scaffolding - see ClientVersionBuild.cs note
                 or ClientVersionBuild.V3_4_3_54261 => true,
             _ => false,
         };
@@ -546,7 +547,10 @@ public static class ModernVersion
                 or ClientVersionBuild.V2_5_3_41812
                 or ClientVersionBuild.V2_5_3_42083
                 or ClientVersionBuild.V2_5_3_42328
-                or ClientVersionBuild.V2_5_3_42598 => ClientVersionBuild.V2_5_3_41750,
+                or ClientVersionBuild.V2_5_3_42598
+                // UNVERIFIED: 2.5.6 reworked nameplates/raid frames per Blizzard patch notes;
+                // reusing 2.5.3's field layout is an assumption pending a real capture diff.
+                or ClientVersionBuild.V2_5_6_68941 => ClientVersionBuild.V2_5_3_41750,
             ClientVersionBuild.V3_4_3_54261 => ClientVersionBuild.V3_4_3_54261,
             _ => ClientVersionBuild.Zero,
         };

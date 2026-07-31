@@ -524,6 +524,10 @@ public enum ClientVersionBuild
     V2_5_3_42328 = 42328, // both live and ptr
     V2_5_3_42598 = 42598, // live
 
+    // TBC Classic 2.5.6 - Phase 1 scaffolding, field-layout/opcode reuse of V2_5_3_41750 is
+    // an UNVERIFIED assumption pending a real captured SMSG_UPDATE_OBJECT packet for this build.
+    V2_5_6_68941 = 68941, // live
+
     // WotLK Classic
     V3_4_3_54261 = 54261,
 
