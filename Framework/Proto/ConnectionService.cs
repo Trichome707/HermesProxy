@@ -490,6 +490,7 @@ public ConnectResponse(ConnectResponse other) : this() {
   serverTime_ = other.serverTime_;
   useBindlessRpc_ = other.useBindlessRpc_;
   binaryContentHandleArray_ = other.HasBinaryContentHandleArray ? other.binaryContentHandleArray_.Clone() : null;
+  ciid_ = other.ciid_;
   _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
 }
 
@@ -675,6 +676,32 @@ public void ClearBinaryContentHandleArray() {
   binaryContentHandleArray_ = null;
 }
 
+// MANUALLY ADDED - not part of the original vendored schema. Confirmed via TrinityCore's
+// current connection_service.pb.h: 'optional string ciid = 9;' (field 9, tag 74 = (9<<3)|2).
+// TBC Anniversary 2.5.6 client appears to require this field to proceed past Connect.
+/// <summary>Field number for the "ciid" field.</summary>
+public const int CiidFieldNumber = 9;
+private readonly static string CiidDefaultValue = "";
+
+private string ciid_;
+[global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+public string Ciid {
+  get { return ciid_ ?? CiidDefaultValue; }
+  set {
+    ciid_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+  }
+}
+/// <summary>Gets whether the "ciid" field is set</summary>
+[global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+public bool HasCiid {
+  get { return ciid_ != null; }
+}
+/// <summary>Clears the value of the "ciid" field</summary>
+[global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+public void ClearCiid() {
+  ciid_ = null;
+}
+
 [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
 public override bool Equals(object other) {
   return Equals(other as ConnectResponse);
@@ -755,6 +782,10 @@ public void WriteTo(pb::CodedOutputStream output) {
     output.WriteRawTag(66);
     output.WriteMessage(BinaryContentHandleArray);
   }
+  if (HasCiid) {
+    output.WriteRawTag(74);
+    output.WriteString(Ciid);
+  }
   if (_unknownFields != null) {
     _unknownFields.WriteTo(output);
   }
@@ -786,6 +817,9 @@ public int CalculateSize() {
   }
   if (HasBinaryContentHandleArray) {
     size += 1 + pb::CodedOutputStream.ComputeMessageSize(BinaryContentHandleArray);
+  }
+  if (HasCiid) {
+    size += 1 + pb::CodedOutputStream.ComputeStringSize(Ciid);
   }
   if (_unknownFields != null) {
     size += _unknownFields.CalculateSize();
@@ -836,6 +870,9 @@ public void MergeFrom(ConnectResponse other) {
       BinaryContentHandleArray = new global::Bgs.Protocol.Connection.V1.ConnectionMeteringContentHandles();
     }
     BinaryContentHandleArray.MergeFrom(other.BinaryContentHandleArray);
+  }
+  if (other.HasCiid) {
+    Ciid = other.Ciid;
   }
   _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
 }
@@ -893,6 +930,10 @@ public void MergeFrom(pb::CodedInputStream input) {
           BinaryContentHandleArray = new global::Bgs.Protocol.Connection.V1.ConnectionMeteringContentHandles();
         }
         input.ReadMessage(BinaryContentHandleArray);
+        break;
+      }
+      case 74: {
+        Ciid = input.ReadString();
         break;
       }
     }

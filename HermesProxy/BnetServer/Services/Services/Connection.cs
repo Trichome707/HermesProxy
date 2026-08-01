@@ -13,15 +13,32 @@ public partial class BnetServices
     [Service(ServiceRequirement.Unauthorized, OriginalHash.ConnectionService, 1)]
     BattlenetRpcErrorCode HandleConnect(ConnectRequest request, ConnectResponse response)
     {
-        if (request.ClientId != null)
-            response.ClientId.MergeFrom(request.ClientId);
-
         response.ServerId = new ProcessId();
         response.ServerId.Label = (uint)Environment.ProcessId;
         response.ServerId.Epoch = (uint)Time.UnixTime;
         response.ServerTime = (ulong)Time.UnixTimeMilliseconds;
 
         response.UseBindlessRpc = request.UseBindlessRpc;
+
+        // TEMP EXPERIMENT - the 2.5.6 client's ConnectRequest never supplies client_id
+        // (confirmed live: "request.ClientId was null"). Real Battle.net/TrinityCore behavior
+        // is to synthesize a client identity when the request doesn't supply one, rather than
+        // skip it - matching the secondary research's note that ciid is generated "from the
+        // session ID and session creation time" when no client_id is present.
+        if (request.ClientId != null)
+        {
+            response.ClientId.MergeFrom(request.ClientId);
+        }
+        else
+        {
+            response.ClientId = new ProcessId();
+            response.ClientId.Label = (uint)GetSession().GetHashCode();
+            response.ClientId.Epoch = (uint)Time.UnixTime;
+            Console.WriteLine($"[CONNECT DEBUG] request.ClientId was null - synthesized ClientId Label={response.ClientId.Label:X8} Epoch={response.ClientId.Epoch:X8}");
+        }
+
+        response.Ciid = $"{response.ServerId.Label:X8}{response.ServerId.Epoch:X8}-{response.ClientId.Label:X8}{response.ClientId.Epoch:X8}";
+        Console.WriteLine($"[CONNECT DEBUG] Set Ciid = {response.Ciid}");
 
         return BattlenetRpcErrorCode.Ok;
     }
