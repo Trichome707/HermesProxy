@@ -35,6 +35,9 @@ public partial class BnetServices
     [Service(ServiceRequirement.Always, OriginalHash.ConnectionService, 7)]
     BattlenetRpcErrorCode HandleRequestDisconnect(DisconnectRequest request)
     {
+        // TEMP DEBUG - print exactly why the client is telling us to disconnect.
+        Console.WriteLine($"[DISCONNECT DEBUG] Client-reported ErrorCode = {request.ErrorCode} (0x{request.ErrorCode:X})");
+
         if (GetSession() != null && GetSession().AuthClient != null)
             GetSession().AuthClient.Disconnect();
 

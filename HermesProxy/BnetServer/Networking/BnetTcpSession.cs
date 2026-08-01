@@ -406,12 +406,21 @@ public class BnetTcpSession : SSLSocket, BnetServices.INetwork
 
             _pooledBuffer.Advance(result.TotalLength);
 
+            // TEMP DEBUG - log every raw packet header unconditionally, bypassing Serilog
+            // levels entirely, to catch anything silently dropped by the ServiceId/ServiceHash
+            // guard below. Remove once the ConnectionService disconnect mystery is solved.
+            Console.WriteLine($"[RAW PACKET] ServiceId={result.Header!.ServiceId} ServiceHash=0x{result.Header.ServiceHash:X8} MethodId={result.Header.MethodId} Token={result.Header.Token} PayloadLen={result.PayloadLength}");
+
             try
             {
                 var stream = new CodedInputStream(result.PayloadArray, 0, result.PayloadLength);
                 if (result.Header!.ServiceId != 0xFE && result.Header.ServiceHash != 0)
                 {
                     _handlerManager.Invoke(result.Header.ServiceId, (OriginalHash)result.Header.ServiceHash, result.Header.MethodId, result.Header.Token, stream);
+                }
+                else
+                {
+                    Console.WriteLine($"[RAW PACKET] DROPPED - ServiceId=0xFE or ServiceHash=0, not dispatched");
                 }
             }
             finally
