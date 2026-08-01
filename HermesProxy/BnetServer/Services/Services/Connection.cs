@@ -40,6 +40,21 @@ public partial class BnetServices
         response.Ciid = $"{response.ServerId.Label:X8}{response.ServerId.Epoch:X8}-{response.ClientId.Label:X8}{response.ClientId.Epoch:X8}";
         Console.WriteLine($"[CONNECT DEBUG] Set Ciid = {response.Ciid}");
 
+        // TEMP EXPERIMENT - ContentHandleArray/BinaryContentHandleArray were never populated,
+        // leaving them null. Wireshark capture showed the client subsequently querying real
+        // Blizzard CDN servers for an all-zero config hash (GET /tpr/wow/config/00/00/000...000),
+        // which fails and appears to cause the ~45s hang/BLZ51903006 disconnect. Testing whether
+        // supplying the client's own real, already-cached CDN Key (from its local .build.info)
+        // here changes this behavior.
+        var contentHandle = new ContentHandle();
+        contentHandle.Region = 1; // matches the 'us' region row in .build.info
+        contentHandle.Usage = 0;  // unknown enum meaning - guess, first attempt
+        contentHandle.Hash = Google.Protobuf.ByteString.CopyFrom(Convert.FromHexString("72c730bef365effe8a1373203e9c8c56"));
+
+        response.ContentHandleArray = new ConnectionMeteringContentHandles();
+        response.ContentHandleArray.ContentHandle.Add(contentHandle);
+        Console.WriteLine("[CONNECT DEBUG] Populated ContentHandleArray with real CDN Key from .build.info");
+
         return BattlenetRpcErrorCode.Ok;
     }
 
