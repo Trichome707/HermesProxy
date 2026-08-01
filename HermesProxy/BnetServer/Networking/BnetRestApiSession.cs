@@ -51,6 +51,12 @@ public sealed class BnetRestApiSession : SSLSocket
     public override async Task ReadHandler(byte[] data, int receivedLength)
     {
         var httpRequest = HttpHelper.ParseRequest(data, receivedLength);
+
+        // TEMP DEBUG - log every REST request unconditionally, to see whether the client
+        // hits this endpoint at all, and with what path/method, during the 2.5.6 Connect
+        // -> RequestDisconnect investigation. Remove once resolved.
+        Console.WriteLine($"[REST DEBUG] Method={httpRequest?.Method} Path={httpRequest?.Path} ContentLen={httpRequest?.Content?.Length ?? 0}");
+
         if (httpRequest == null || !RequestRouter(httpRequest))
         {
             CloseSocket();
@@ -97,6 +103,9 @@ public sealed class BnetRestApiSession : SSLSocket
         globalSession.OS = pathElements[1];
         globalSession.Build = uint.Parse(pathElements[2]);
         globalSession.Locale = pathElements[3];
+
+        // TEMP DEBUG
+        Console.WriteLine($"[REST DEBUG] Login request - OS={globalSession.OS} Build={globalSession.Build} Locale={globalSession.Locale} (expected ModernVersion.Build={ModernVersion.BuildInt})");
 
         // Should never happen. Session.HandleLogon checks version already
         if (ModernVersion.Build != (ClientVersionBuild) globalSession.Build)
